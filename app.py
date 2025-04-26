@@ -1,17 +1,12 @@
-import os
 import streamlit as st
 import openai
 from pinecone import Pinecone, ServerlessSpec
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# API keys and Pinecone setup
-openai.api_key = os.getenv("OPENAI_API_KEY")
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-pinecone_env = os.getenv("PINECONE_ENV")
-pinecone_index_name = os.getenv("PINECONE_INDEX")
+# Fetch API keys and environment from Streamlit Secrets
+pinecone_api_key = st.secrets["PINECONE_API_KEY"]
+pinecone_env = st.secrets["PINECONE_ENV"]
+pinecone_index_name = st.secrets["PINECONE_INDEX"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize Pinecone
 pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
@@ -78,7 +73,7 @@ st.markdown("""
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Custom bubble style
+# Custom message bubbles
 def message_bubble(role, message):
     if role == "User":
         st.markdown(f"""
@@ -122,7 +117,7 @@ if submitted and user_input:
     matches = query_response.get("matches", [])
     context = " ".join([match["metadata"].get("text", "") for match in matches])
 
-    # Build prompt dynamically
+    # Build dynamic prompt
     if context.strip():
         prompt = f"""You are a friendly and helpful AI assistant. Use the following context from the knowledge base to answer the question.
 Be concise, conversational, and helpful. Focus only on Generative AI topics like embeddings, transformers, RAG, GANs, etc.
