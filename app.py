@@ -13,13 +13,10 @@ pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-pc = Pinecone(
-    api_key=pinecone_api_key,
-    environment=pinecone_env
-)
+# Initialize Pinecone
+pc = Pinecone(api_key=pinecone_api_key)  # <-- Only api_key here (NO environment)
 
-
-# Create index if not exists
+# Create index if it does not exist
 if pinecone_index_name not in pc.list_indexes().names():
     pc.create_index(
         name=pinecone_index_name,
@@ -42,18 +39,15 @@ with st.sidebar:
     Feel free to ask follow-up questions or explore related topics!
     """, unsafe_allow_html=True)
 
-    # Light/Dark Mode Toggle
     theme_toggle = st.radio("🌗 Theme", ["Light", "Dark"])
     st.session_state.theme = theme_toggle
 
-    # File upload for knowledge base
     uploaded_file = st.file_uploader("📄 Upload Knowledge Base", type=["txt", "md"])
     if uploaded_file is not None:
         uploaded_text = uploaded_file.read().decode("utf-8")
         st.session_state.uploaded_kb = uploaded_text
         st.success("Knowledge base uploaded successfully!")
 
-    # Reset chat
     if st.button("🧹 Reset Chat"):
         st.session_state.history = []
         st.rerun()
@@ -62,34 +56,13 @@ with st.sidebar:
 if st.session_state.get("theme") == "Dark":
     st.markdown("""
         <style>
-        body, .stApp {
-            background-color: #0e1117;
-            color: white;
-        }
-        .sidebar .sidebar-content {
-            background-color: #1c1f26;
-        }
-        .user-bubble {
-            background-color: #1f2937 !important;
-            color: white !important;
-        }
-        .assistant-bubble {
-            background-color: #374151 !important;
-            color: white !important;
-        }
-        input[type="text"], .stTextInput > div > div > input {
-            background-color: #1f2937 !important;
-            color: white !important;
-            border: 1px solid #4b5563 !important;
-        }
-        .stButton button {
-            background-color: #3b82f6 !important;
-            color: white !important;
-            border: none;
-        }
-        .stButton button:hover {
-            background-color: #2563eb !important;
-        }
+        body, .stApp { background-color: #0e1117; color: white; }
+        .sidebar .sidebar-content { background-color: #1c1f26; }
+        .user-bubble { background-color: #1f2937 !important; color: white !important; }
+        .assistant-bubble { background-color: #374151 !important; color: white !important; }
+        input[type="text"], .stTextInput > div > div > input { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
+        .stButton button { background-color: #3b82f6 !important; color: white !important; border: none; }
+        .stButton button:hover { background-color: #2563eb !important; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -130,7 +103,6 @@ with st.form("chat-form", clear_on_submit=True):
     user_input = st.text_input("Your question here:", key="input")
     submitted = st.form_submit_button("Ask")
 
-# When user submits a question
 if submitted and user_input:
     st.session_state.history.append(("User", user_input))
 
@@ -160,8 +132,7 @@ Context: {context}
 Question: {user_input}
 Answer:"""
     else:
-        prompt = f"""You are a friendly AI assistant. The user's question may not directly match the provided knowledge base, but you can still answer if it's closely related to generative AI (like LLMs, embeddings, transformers, GANs, etc).
-If it's clearly off-topic, gently let the user know. Be warm and polite.
+        prompt = f"""You are a friendly AI assistant. Even if the user's question doesn't match the knowledge base exactly, answer if it's about Generative AI topics (LLMs, transformers, GANs, RAG, etc). If not, gently say it's off-topic.
 
 Question: {user_input}
 Answer:"""
