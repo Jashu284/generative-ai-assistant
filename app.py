@@ -21,7 +21,7 @@ pinecone_index_name = get_secret("PINECONE_INDEX")
 openai.api_key = get_secret("OPENAI_API_KEY")
 
 # Initialize Pinecone
-pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
+pc = Pinecone(api_key=pinecone_api_key)
 
 # Create index if it does not exist
 if pinecone_index_name not in [index.name for index in pc.list_indexes()]:
@@ -32,6 +32,7 @@ if pinecone_index_name not in [index.name for index in pc.list_indexes()]:
         spec=ServerlessSpec(cloud="aws", region=pinecone_env)
     )
 
+# Connect to the index
 index = pc.Index(pinecone_index_name)
 
 # Streamlit config
