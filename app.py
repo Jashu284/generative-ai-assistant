@@ -1,23 +1,24 @@
-import os
 import streamlit as st
 import openai
 from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
+import os
 
-# Load environment variables from .env file
+# Load environment variables from .env (for local testing)
 load_dotenv()
 
-# Fetch API keys and environment from OS Environment Variables
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-pinecone_env = os.getenv("PINECONE_ENV")
-pinecone_index_name = os.getenv("PINECONE_INDEX")
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Helper function to fetch secrets safely
+def get_secret(key):
+    try:
+        return st.secrets[key]
+    except Exception:
+        return os.getenv(key)
 
-# Debugging - you can uncomment this to check if environment variables are loaded
-# st.write("Pinecone API Key:", pinecone_api_key)
-# st.write("Pinecone Env:", pinecone_env)
-# st.write("Pinecone Index:", pinecone_index_name)
-# st.write("OpenAI API Key:", openai.api_key)
+# Fetch API keys and environment
+pinecone_api_key = get_secret("PINECONE_API_KEY")
+pinecone_env = get_secret("PINECONE_ENV")
+pinecone_index_name = get_secret("PINECONE_INDEX")
+openai.api_key = get_secret("OPENAI_API_KEY")
 
 # Initialize Pinecone
 pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
