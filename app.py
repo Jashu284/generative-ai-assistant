@@ -1,14 +1,23 @@
+import os
 import streamlit as st
 import openai
 from pinecone import Pinecone, ServerlessSpec
+from dotenv import load_dotenv
 
-# Fetch API keys and environment from Streamlit Secrets
-pinecone_api_key = st.secrets["PINECONE_API_KEY"]
-pinecone_env = st.secrets["PINECONE_ENV"]
-pinecone_index_name = st.secrets["PINECONE_INDEX"]
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Load environment variables from .env file
+load_dotenv()
 
-st.write(st.secrets) #temporary check
+# Fetch API keys and environment from OS Environment Variables
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_env = os.getenv("PINECONE_ENV")
+pinecone_index_name = os.getenv("PINECONE_INDEX")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Debugging - you can uncomment this to check if environment variables are loaded
+# st.write("Pinecone API Key:", pinecone_api_key)
+# st.write("Pinecone Env:", pinecone_env)
+# st.write("Pinecone Index:", pinecone_index_name)
+# st.write("OpenAI API Key:", openai.api_key)
 
 # Initialize Pinecone
 pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
@@ -75,7 +84,7 @@ st.markdown("""
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Custom message bubbles
+# Custom bubble style
 def message_bubble(role, message):
     if role == "User":
         st.markdown(f"""
@@ -119,7 +128,7 @@ if submitted and user_input:
     matches = query_response.get("matches", [])
     context = " ".join([match["metadata"].get("text", "") for match in matches])
 
-    # Build dynamic prompt
+    # Build prompt dynamically
     if context.strip():
         prompt = f"""You are a friendly and helpful AI assistant. Use the following context from the knowledge base to answer the question.
 Be concise, conversational, and helpful. Focus only on Generative AI topics like embeddings, transformers, RAG, GANs, etc.
