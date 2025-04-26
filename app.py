@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Fetch API keys and environment from OS Environment Variables
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_api_key = "pcsk_69FCXk_L3WhjjBFV8wXxcYjp7KjpYGoMAoC1odyUqqw1rsg39Jfm6fMNEVTtewY6hbr6GP"
 pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 openai.api_key = os.getenv("OPENAI_API_KEY")
