@@ -1,4 +1,4 @@
 streamlit
-openai
-pinecone
+openai==0.28.1
+pinecone-client>=3.0.0
 python-dotenv
