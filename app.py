@@ -10,13 +10,14 @@ load_dotenv()
 # API keys and Pinecone setup
 openai.api_key = os.getenv("OPENAI_API_KEY")
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
-pinecone_env = os.getenv("PINECONE_ENV")
+pinecone_env = os.getenv("PINECONE_ENVIRONMENT")  # ✅ Changed correctly
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-# Initialize Pinecone
-pc = Pinecone(api_key=pinecone_api_key)
+# Initialize Pinecone (✅ fixed initialization)
+pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
+
 # Create index if it does not exist
-if pinecone_index_name not in pc.list_indexes().names():
+if pinecone_index_name not in [index.name for index in pc.list_indexes()]:
     pc.create_index(
         name=pinecone_index_name,
         dimension=1536,
@@ -34,15 +35,15 @@ with st.sidebar:
     st.markdown("""
     <h3 style='margin-bottom: 5px;'>📘 About</h3>
     <b>Generative AI Assistant</b><br>
-    This assistant is built specifically to help you with Generative AI topics like transformers, embeddings, RAG, GANs, and more.<br><br>
-    Feel free to ask follow-up questions or explore related topics!
+    This assistant helps you with Generative AI topics like transformers, embeddings, RAG, GANs, and more.<br><br>
+    Feel free to ask follow-up questions!
     """, unsafe_allow_html=True)
 
     theme_toggle = st.radio("🌗 Theme", ["Light", "Dark"])
     st.session_state.theme = theme_toggle
 
     uploaded_file = st.file_uploader("📄 Upload Knowledge Base", type=["txt", "md"])
-    if uploaded_file is not None:
+    if uploaded_file:
         uploaded_text = uploaded_file.read().decode("utf-8")
         st.session_state.uploaded_kb = uploaded_text
         st.success("Knowledge base uploaded successfully!")
@@ -69,7 +70,7 @@ if st.session_state.get("theme") == "Dark":
 st.markdown("""
     <div style='text-align: center;'>
         <h1 style='font-size: 48px; margin-bottom: 5px;'>🧠 Generative AI Assistant</h1>
-        <p style='color: grey;'>Ask me anything based on Generative AI knowledge base.</p>
+        <p style='color: grey;'>Ask anything about Generative AI knowledge base.</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -124,7 +125,7 @@ if submitted and user_input:
     # Build prompt dynamically
     if context.strip():
         prompt = f"""You are a friendly and helpful AI assistant. Use the following context from the knowledge base to answer the question.
-Be concise, conversational, and helpful. Only focus on Generative AI topics or their related subtopics like embeddings, transformers, RAG, GANs, etc.
+Be concise, conversational, and helpful. Focus only on Generative AI topics like embeddings, transformers, RAG, GANs, etc.
 
 Context: {context}
 
