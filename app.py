@@ -16,7 +16,7 @@ def get_secret(key):
 
 # Fetch API keys and environment
 pinecone_api_key = get_secret("PINECONE_API_KEY")
-pinecone_env = get_secret("PINECONE_ENV")
+pinecone_env = "pcsk_69FCXk_L3WhjjBFV8wXxcYjp7KjpYGoMAoC1odyUqqw1rsg39Jfm6fMNEVTtewY6hbr6GP"
 pinecone_index_name = get_secret("PINECONE_INDEX")
 openai.api_key = get_secret("OPENAI_API_KEY")
 
