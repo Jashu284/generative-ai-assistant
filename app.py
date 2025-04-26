@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import openai
-import pinecone
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -13,17 +13,18 @@ pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
+pc = Pinecone(api_key=pinecone_api_key)
 
 # Create index if not exists
-if pinecone_index_name not in pinecone.list_indexes():
-    pinecone.create_index(
+if pinecone_index_name not in pc.list_indexes().names():
+    pc.create_index(
         name=pinecone_index_name,
         dimension=1536,
-        metric="cosine"
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region=pinecone_env)
     )
 
-index = pinecone.Index(pinecone_index_name)
+index = pc.Index(pinecone_index_name)
 
 # Streamlit config
 st.set_page_config(page_title="Generative AI Assistant", layout="centered")
