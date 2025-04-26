@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import openai
-from pinecone import Pinecone, ServerlessSpec, Config
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,13 +14,7 @@ pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
 # Initialize Pinecone
-pc = Pinecone(
-    config=Config(
-        api_key=pinecone_api_key,
-        environment=pinecone_env
-    )
-)
-
+pc = Pinecone(api_key=pinecone_api_key)
 # Create index if it does not exist
 if pinecone_index_name not in pc.list_indexes().names():
     pc.create_index(
