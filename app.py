@@ -1,31 +1,29 @@
 import os
 import streamlit as st
-from openai import OpenAI
-from pinecone import Pinecone, ServerlessSpec
+import openai
+import pinecone
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 # API keys and Pinecone setup
-openai_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-client = OpenAI(api_key=openai_key)
-pc = Pinecone(api_key=pinecone_api_key)
+pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
 
 # Create index if not exists
-if pinecone_index_name not in pc.list_indexes().names():
-    pc.create_index(
+if pinecone_index_name not in pinecone.list_indexes():
+    pinecone.create_index(
         name=pinecone_index_name,
         dimension=1536,
-        metric="cosine",
-        spec=ServerlessSpec(cloud="aws", region=pinecone_env)
+        metric="cosine"
     )
 
-index = pc.Index(pinecone_index_name)
+index = pinecone.Index(pinecone_index_name)
 
 # Streamlit config
 st.set_page_config(page_title="Generative AI Assistant", layout="centered")
@@ -132,10 +130,10 @@ if submitted and user_input:
     st.session_state.history.append(("User", user_input))
 
     # Get embedding for the question
-    embedding = client.embeddings.create(
+    embedding = openai.Embedding.create(
         model="text-embedding-3-small",
         input=user_input
-    ).data[0].embedding
+    )["data"][0]["embedding"]
 
     # Query Pinecone for relevant chunks
     query_response = index.query(
@@ -164,12 +162,12 @@ Question: {user_input}
 Answer:"""
 
     # Generate response
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}]
     )
 
-    answer = response.choices[0].message.content.strip()
+    answer = response["choices"][0]["message"]["content"].strip()
 
     st.session_state.history.append(("Assistant", answer))
-    st.rerun()  # Refresh to show latest messages
+    st.rerun()
