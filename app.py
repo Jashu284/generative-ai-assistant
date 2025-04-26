@@ -8,6 +8,8 @@ pinecone_env = st.secrets["PINECONE_ENV"]
 pinecone_index_name = st.secrets["PINECONE_INDEX"]
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+st.write(st.secrets) #temporary check
+
 # Initialize Pinecone
 pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
 
