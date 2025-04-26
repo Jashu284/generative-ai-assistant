@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from openai import OpenAI
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,7 +14,17 @@ pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
 client = OpenAI(api_key=openai_key)
-pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
+pc = Pinecone(api_key=pinecone_api_key)
+
+# Create index if not exists
+if pinecone_index_name not in pc.list_indexes().names():
+    pc.create_index(
+        name=pinecone_index_name,
+        dimension=1536,
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region=pinecone_env)
+    )
+
 index = pc.Index(pinecone_index_name)
 
 # Streamlit config
@@ -159,7 +169,6 @@ Answer:"""
         messages=[{"role": "user", "content": prompt}]
     )
 
-    
     answer = response.choices[0].message.content.strip()
 
     st.session_state.history.append(("Assistant", answer))
