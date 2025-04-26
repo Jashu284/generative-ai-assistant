@@ -13,7 +13,11 @@ pinecone_api_key = os.getenv("PINECONE_API_KEY")
 pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-pc = Pinecone(api_key=pinecone_api_key)
+pc = Pinecone(
+    api_key=pinecone_api_key,
+    environment=pinecone_env
+)
+
 
 # Create index if not exists
 if pinecone_index_name not in pc.list_indexes().names():
