@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # API keys and Pinecone setup
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-pinecone_api_key = st.secrets["PINECONE_API_KEY"]
-pinecone_env = st.secrets["PINECONE_ENVIRONMENT"]
-pinecone_index_name = st.secrets["PINECONE_INDEX"]
+openai.api_key = os.getenv("OPENAI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_env = os.getenv("PINECONE_ENVIRONMENT")
+pinecone_index_name = os.getenv("PINECONE_INDEX")
 
-# Initialize Pinecone (✅ fixed initialization)
+# Initialize Pinecone
 pc = Pinecone(api_key=pinecone_api_key, environment=pinecone_env)
 
 # Create index if it does not exist
