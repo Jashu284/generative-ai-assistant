@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from openai import OpenAI
-from pinecone import Pinecone
+import pinecone
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,8 +14,8 @@ pinecone_env = os.getenv("PINECONE_ENV")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 
 client = OpenAI(api_key=openai_key)
-pc = Pinecone(api_key=pinecone_api_key)
-index = pc.Index(pinecone_index_name)
+pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
+index = pinecone.Index(pinecone_index_name)
 
 # Streamlit config
 st.set_page_config(page_title="Generative AI Assistant", layout="centered")
@@ -158,6 +158,8 @@ Answer:"""
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}]
     )
+
+    
     answer = response.choices[0].message.content.strip()
 
     st.session_state.history.append(("Assistant", answer))
